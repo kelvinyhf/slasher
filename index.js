@@ -8,11 +8,29 @@ const app = new App({
   socketMode: true
 });
 
+// Help
+app.command("/slasher-help", async ({ ack, respond }) => {
+  await ack();
+  await respond({
+    text:
+`Available Commands:
+/slasher-hello - Greeting from Slasher
+/slasher-ping - Check bot latency`
+  });
+});
+
+// Hello
+app.command("/slasher-hello", async ({ command, ack, respond }) => {
+  await ack();
+  await respond({ text: "Hello! I am Slasher, a Slackbot made by KelvinY. Type /slasher-help to see all the commands." });
+});
+
+// Ping
 app.command("/slasher-hello", async ({ command, ack, respond }) => {
   const start = Date.now();
   await ack();
   const latency = Date.now() - start;
-  await respond({ text: `Pong!\nLatency: ${latency}ms` });
+  await respond({ text: `Latency: ${latency}ms` });
 });
 
 (async () => {
