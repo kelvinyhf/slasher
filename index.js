@@ -26,7 +26,7 @@ app.command("/slasher-hello", async ({ command, ack, respond }) => {
 });
 
 // Ping
-app.command("/slasher-hello", async ({ command, ack, respond }) => {
+app.command("/slasher-ping", async ({ command, ack, respond }) => {
   const start = Date.now();
   await ack();
   const latency = Date.now() - start;
