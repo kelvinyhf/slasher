@@ -16,7 +16,8 @@ app.command("/slasher-help", async ({ ack, respond }) => {
 `Available Commands:
 /slasher-hello - Greeting from Slasher
 /slasher-ping - Check bot latency
-/slasher-trivia - Get a random trivia about the world`
+/slasher-trivia - Get a random trivia about the world
+/slasher-ask - Ask Slasher anything`
   });
 });
 
@@ -45,8 +46,32 @@ app.command("/slasher-trivia", async ({ command, ack, respond }) => {
     const data = await response.json();
     await respond({
       response_type: "in_channel",
-      text: `${data.text}`
+      text: data.text
     });
+  } catch {
+    await respond({ text: "Something went wrong, please try again later." });
+  }
+});
+
+// Ask
+app.command("/slasher-ask", async ({ command, ack, respond }) => {
+  await ack();
+
+  // Get user's prompt. If typed nothing, tell user to ask something
+  const userPrompt = command.text.trim();
+  if (!userPrompt) {
+    await respond({ text: "Please enter the question that you want to ask Slasher, like `/slasher-ask Today's Weather`" });
+    return;
+  }
+
+  try {
+    const data = await fetch("https://slasher.kelviny.workers.dev", {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain' },
+      body: userPrompt
+    });
+    const response = await data.json();
+    await respond({ text: response.response });
   } catch {
     await respond({ text: "Something went wrong, please try again later." });
   }
