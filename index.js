@@ -60,9 +60,12 @@ app.command("/slasher-ask", async ({ command, ack, respond }) => {
   // Get user's prompt. If typed nothing, tell user to ask something
   const userPrompt = command.text.trim();
   if (!userPrompt) {
-    await respond({ text: "Please enter the question that you want to ask Slasher, like `/slasher-ask Today's Weather`" });
+    await respond({ text: "Please enter the question that you want to ask Slasher, like `/slasher-ask Who are you?`" });
     return;
   }
+
+  // Send thinking message
+  await respond({ text: "Slasher is thinking..." });
 
   try {
     const data = await fetch("https://slasher.kelviny.workers.dev", {
@@ -71,9 +74,15 @@ app.command("/slasher-ask", async ({ command, ack, respond }) => {
       body: userPrompt
     });
     const response = await data.json();
-    await respond({ text: response.response });
+
+    if (response.error) {
+      await respond({ text: "Something went wrong, please try again later.", replace_original: true });
+      return;
+    }
+
+    await respond({ text: response.response, replace_original: true });
   } catch {
-    await respond({ text: "Something went wrong, please try again later." });
+    await respond({ text: "Something went wrong, please try again later.", replace_original: true });
   }
 });
 
