@@ -53,14 +53,36 @@ app.command("/slasher-trivia", async ({ command, ack, respond }) => {
   }
 });
 
+function markdownToMrkdwn(text) {
+  if (!text) return "";
+
+  return text
+    // 1. Convert headers (# Header) to *BOLD TEXT*
+    .replace(/^#{1,6}\s+(.*)$/gm, '*$1*')
+
+    // 2. Convert bold (**text** or __text__) to *text*
+    .replace(/(\*\*|__)(.*?)\1/g, '*$2*')
+
+    // 3. Convert strikethrough (~~text~~) to ~text~
+    .replace(/~~(.*?)~~/g, '~$1~')
+
+    // 4. Convert links [text](url) to <url|text>
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<$2|$1>')
+
+    // 5. Clean up code blocks: remove language tags like ```javascript -> ```
+    .replace(/```[a-zA-Z0-9_-]+\n/g, '```\n')
+
+    // 6. Convert unformatted bold-italics (***text***) to *_text_*
+    .replace(/\*\*\*(.*?)\*\*\*/g, '*_$1_*');
+}
+
 // Ask
 app.command("/slasher-ask", async ({ command, ack, respond }) => {
-  await ack();
-
-  // Get user's prompt. If typed nothing, tell user to ask something
   const userPrompt = command.text.trim();
+
+  // If typed nothing tell user to ask something
   if (!userPrompt) {
-    await respond({
+    await ack({
       response_type: "in_channel",
       text: "Please enter the question that you want to ask Slasher, like `/slasher-ask Who are you?`"
     });
@@ -68,7 +90,7 @@ app.command("/slasher-ask", async ({ command, ack, respond }) => {
   }
 
   // Send thinking message
-  await respond({
+  await ack({
     response_type: "in_channel",
     text: "Slasher is thinking..."
   });
@@ -93,7 +115,7 @@ app.command("/slasher-ask", async ({ command, ack, respond }) => {
     await respond({
       response_type: "in_channel",
       replace_original: true,
-      text: `*Q: ${userPrompt}*\n${response.response}`
+      text: markdownToMrkdwn(response.response)
     });
 
   } catch (err) {
