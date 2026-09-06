@@ -25,8 +25,7 @@ app.command("/slasher-help", async ({ ack, respond }) => {
 app.command("/slasher-hello", async ({ command, ack, respond }) => {
   await ack();
   await respond({
-    response_type: "in_channel",
-    text: "Hello! I am Slasher, a Slackbot made by KelvinY. Type /slasher-help to see all the commands."
+    text: "Hello! I am Slasher, a friendly Slackbot. Type /slasher-help to see all the commands."
   });
 });
 
